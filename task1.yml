@@ -1,0 +1,14 @@
+- hosts: node01
+  become: true
+
+  tasks:
+     - name: creating folder
+       file:
+         name: /tmp/sam
+         state: directory
+     - name: creating a file under the folder
+       copy:
+         content: |
+                 I am ansible
+         dest: /tmp/sam/index.txt          
+

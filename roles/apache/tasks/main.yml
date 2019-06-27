@@ -1,0 +1,30 @@
+- name: installing  apache
+  yum: 
+    name: ['httpd','httpd-tools']
+    state: "installed"
+
+- name: copying the file for document root
+  copy:
+    src: "index.html"
+    dest: /var/www/html
+
+- name: copying the httpd.conf to conf location
+  template:
+    src: httpd.conf.j2
+    dest: /etc/httpd/conf/httpd.conf
+  notify: restarted
+
+- name: starting the service
+  service:
+    name: "httpd"
+    state: "started"
+
+- name: gathering the data
+  shell: |
+        ps aux | grep httpd > /tmp/tasks
+
+- name: copying the file from the remote server to local
+  fetch:
+    src: /tmp/tasks
+    dest: /mnt
+

@@ -1,0 +1,14 @@
+- hosts: node01
+  become: true
+
+  tasks:
+    - name: finding folder named praveen
+      shell: |
+            ls /home/ | grep -i praveen
+      register: output
+
+    - name: creating folder if praveen exists
+      command: mkdir /mnt/praveen
+      when: ( 'praveen' in output.stdout ) 
+              
+  

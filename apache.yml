@@ -1,0 +1,41 @@
+- hosts: dev
+  become: true
+  vars:
+    pack: ['httpd','httpd-tools']
+    ports: 9090
+
+  tasks:
+
+    - name: Checking if it is redhat
+      debug:
+        msg: "continue if it is redhat family"
+
+    - name: Continue if it is redhat family
+      meta: end_play
+      when:  ( ansible_distribution != "CentOS" )
+
+    - name: installing packages
+      yum:
+        name: "{{ pack }}"
+        state: "installed"
+
+    - name: copying conf
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - { src: "httpd.conf.j2" , dest: "/etc/httpd/conf/httpd.conf" }
+        - { src: "index.html" , dest: "/var/www/html/index.html" }
+      notify: restart
+      
+    - name: starting service
+      service:
+        name: "{{ pack[0] }}"
+        state: "started"
+
+  handlers:
+    - name: restart
+      service:
+        name: "httpd"
+        state: "restarted"
+
